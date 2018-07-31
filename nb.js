@@ -3,11 +3,11 @@ function welcomeMessage() {
 };
 
 function fileName() {
-    var theError = new Error('here i am');
+    const theError = new Error('here i am');
     return theError.stack.match(/\/(\w+\.js)\:/)[1];
 };
 
-var songList = {
+const songList = {
     difficulties: ['easy', 'medium', 'hard'],
     songs: [],
     addSong: function(name, chords, difficulty) {
@@ -18,7 +18,7 @@ var songList = {
     }
 };
 
-var classifier = {
+const classifier = {
     songs: [],
     allChords: new Set(),
     labelCounts: new Map(),
@@ -83,12 +83,12 @@ function setLabelsAndProbabilities() {
 }
 
 function classify(chords) {
-    var smoothing = 1.01;
-    var classified = new Map();
+    const smoothing = 1.01;
+    const classified = new Map();
     classifier.labelProbabilities.forEach(function(_probabilities, difficulty) {
-        var first = classifier.labelProbabilities.get(difficulty) + smoothing;
+        let first = classifier.labelProbabilities.get(difficulty) + smoothing;
         chords.forEach(function(chord){
-            var probabilityOfChordInLabel = 
+            const probabilityOfChordInLabel = 
                 classifier.probabilityOfChordsInLabels.get(difficulty)[chord];
             if (probabilityOfChordInLabel) {
                 first = first * (probabilityOfChordInLabel + smoothing);
@@ -99,7 +99,7 @@ function classify(chords) {
     return classified;
 };
 
-var wish = require('wish');
+const wish = require('wish');
 describe('the file', function() { 
     songList.addSong('imagine', ['c', 'cmaj7', 'f', 'am', 'dm', 'g', 'e7'], 0);
     songList.addSong('somewhereOverTheRainbow', ['c', 'em', 'f', 'g', 'am'], 0);
@@ -116,14 +116,14 @@ describe('the file', function() {
         wish(welcomeMessage() === 'Welcome to nb.js!');
     });
     it('classifies', function(){
-        var classified = classify(['f#m7', 'a',   'dadd9', 'dmaj7', 
+        const classified = classify(['f#m7', 'a',   'dadd9', 'dmaj7', 
                                     'bm',  'bm7', 'd',     'f#m']);
         wish(classified.get('easy') === 1.3433333333333333);
         wish(classified.get('medium') === 1.5060259259259259);
         wish(classified.get('hard') === 1.6884223991769547);
     });
     it('classifies again', function(){
-        var classified = classify(['d', 'g', 'e', 'dm']);
+        const classified = classify(['d', 'g', 'e', 'dm']);
         wish(classified.get('easy') === 2.023094827160494);
         wish(classified.get('medium') === 1.855758613168724);
         wish(classified.get('hard') === 1.855758613168724);
