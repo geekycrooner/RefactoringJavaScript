@@ -23,13 +23,10 @@ var classifier = {
     probabilityOfChordsInLabels: new Map()
 };   
 
-function setDifficulties() {
-    easy = 'easy';
-    medium = 'medium';
-    hard = 'hard';
-}
-
 function setSongs() {
+    var easy = 'easy';
+    var medium = 'medium';
+    var hard = 'hard';
     songList.addSong('imagine', ['c', 'cmaj7', 'f', 'am', 'dm', 'g', 'e7'], easy);
     songList.addSong('somewhereOverTheRainbow', ['c', 'em', 'f', 'g', 'am'], easy);
     songList.addSong('tooManyCooks', ['c', 'g', 'f'], easy);
@@ -85,7 +82,6 @@ function setProbabilityOfChordsInLabels(){
 };
 
 function trainAll() {
-    setDifficulties();
     setSongs();
     songList.songs.forEach(function(song) {
         train(song.chords, song.difficulty);
