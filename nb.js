@@ -21,26 +21,37 @@ const songList = {
 };
 
 const classifier = {
-    songs: [],
-    allChords: new Set(),
-    labelCounts: new Map(),
-    labelProbabilities: new Map(),
-    chordCountsInLabels: new Map(),
-    smoothing: 1.01, 
-    valueForChordDifficulty: function (difficulty, chord) {
-        const value = this.chordCountsInLabels.get(difficulty)[chord];
-        return value ? value + this.smoothing : 1;
-    },
-    classify: function (chords) {
-        return new Map(Array.from(this.labelProbabilities.entries()).map(
-            (labelWithProbability) => {
-                const difficulty = labelWithProbability[0];
-                return [difficulty, chords.reduce((total, chord) => {
-                    return total * this.valueForChordDifficulty(difficulty, chord);
-                }, this.labelProbabilities.get(difficulty) + this.smoothing)];
-            }
-        ));
-    }
+  songs: [],
+  allChords: new Set(),
+  labelCounts: new Map(),
+  labelProbabilities: new Map(),
+  chordCountsInLabels: new Map(),
+  smoothing: 1.01, 
+  classify: function (chords) {
+      return new Map(Array.from(this.labelProbabilities.entries()).map(
+          (labelWithProbability) => {
+              const difficulty = labelWithProbability[0];
+              return [difficulty, chords.reduce((total, chord) => {
+                  return total * this.valueForChordDifficulty(difficulty, chord);
+              }, this.labelProbabilities.get(difficulty) + this.smoothing)];
+          }
+      ));
+  },
+  setProbabilityOfChordsInLabels: function() {
+    this.chordCountsInLabels.forEach(
+      function(_chords, difficulty) {
+        Object.keys(this.chordCountsInLabels.get(difficulty))
+          .forEach(function(chord) {
+            this.chordCountsInLabels.get(difficulty)[chord] /= 
+              this.songs.length;
+          }, this);
+      }, this
+    );
+  },
+  valueForChordDifficulty: function (difficulty, chord) {
+    const value = this.chordCountsInLabels.get(difficulty)[chord];
+    return value ? value + this.smoothing : 1;
+  }    
 };   
 
 
@@ -75,18 +86,6 @@ function setChordCountsInLabels() {
     });
 }
 
-function setProbabilityOfChordsInLabels() {
-  classifier.chordCountsInLabels.forEach(
-    function(_chords, difficulty) {
-      Object.keys(classifier.chordCountsInLabels.get(difficulty))
-        .forEach(function(chord) {
-          classifier.chordCountsInLabels.get(difficulty)[chord] /= 
-            classifier.songs.length;
-        });
-    }
-  );
-}
-
 function trainAll() {
     songList.songs.forEach(function(song) {
         train(song.chords, song.difficulty);
@@ -97,7 +96,7 @@ function trainAll() {
 function setLabelsAndProbabilities() {
     setLabelProbabilities();
     setChordCountsInLabels();
-    setProbabilityOfChordsInLabels();
+    classifier.setProbabilityOfChordsInLabels();
 }
 
 const wish = require('wish');
