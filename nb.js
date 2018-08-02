@@ -1,11 +1,13 @@
+/* eslint-disable react/jsx-sort-prop-types,react/require-extension,react/wrap-multilines */
+
 function welcomeMessage() {
     return `Welcome to ${fileName()}!`;
-};
+}
 
 function fileName() {
     const theError = new Error('here i am');
     return theError.stack.match(/\/(\w+\.js)\:/)[1];
-};
+}
 
 const songList = {
     difficulties: ['easy', 'medium', 'hard'],
@@ -45,19 +47,19 @@ const classifier = {
 
 function train (chords, label) {
     classifier.songs.push({label, chords});
-    chords.forEach((chord => classifier.allChords.add(chord)));
+    chords.forEach(chord => classifier.allChords.add(chord));
     if (Array.from(classifier.labelCounts.keys()).includes(label)) {
         classifier.labelCounts.set(label, classifier.labelCounts.get(label) + 1);
     } else {
         classifier.labelCounts.set(label, 1);
     }
-};
+}
 
 function setLabelProbabilities() {
     classifier.labelCounts.forEach(function(_count, label){
         classifier.labelProbabilities.set(label, classifier.labelCounts.get(label) / classifier.songs.length);
     });
-};
+}
 
 function setChordCountsInLabels() {
     classifier.songs.forEach(function(song){
@@ -72,18 +74,20 @@ function setChordCountsInLabels() {
             }
         });
     });
-};
+}
 
-function setProbabilityOfChordsInLabels(){
-    classifier.probabilityOfChordsInLabels = classifier.chordCountsInLabels;
-    classifier.probabilityOfChordsInLabels.forEach(function(_chords, difficulty) {
-        Object.keys(classifier.probabilityOfChordsInLabels.get(difficulty)).forEach(
-            function(chord){
-                classifier.probabilityOfChordsInLabels.get(difficulty)[chord] /= classifier.songs.length;
-            }
-        );
-    });
-};
+function setProbabilityOfChordsInLabels() {
+  classifier.probabilityOfChordsInLabels = classifier.chordCountsInLabels;
+  classifier.probabilityOfChordsInLabels.forEach(
+    function(_chords, difficulty) {
+      Object.keys(classifier.probabilityOfChordsInLabels.get(difficulty))
+        .forEach(function(chord) {
+          classifier.probabilityOfChordsInLabels.get(difficulty)[chord] /= 
+            classifier.songs.length;
+        });
+    }
+  );
+}
 
 function trainAll() {
     songList.songs.forEach(function(song) {
@@ -96,7 +100,7 @@ function setLabelsAndProbabilities() {
     setLabelProbabilities();
     setChordCountsInLabels();
     setProbabilityOfChordsInLabels();
-};
+}
 
 const wish = require('wish');
 
