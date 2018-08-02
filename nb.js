@@ -39,6 +39,20 @@ const classifier = {
   likelihoodFromChord: function(difficulty, chord) {
     return this.chordCountsInLabels.get(difficulty)[chord] / songList.songs.length;
   }, 
+  setChordCountsInLabels: function() {
+    songList.songs.forEach(function(song) {
+      if (this.chordCountsInLabels.get(song.difficulty) === undefined) {
+        this.chordCountsInLabels.set(song.difficulty, {});
+      }
+      song.chords.forEach(function(chord) {
+        if (this.chordCountsInLabels.get(song.difficulty)[chord] > 0) {
+          this.chordCountsInLabels.get(song.difficulty)[chord] += 1;
+        } else {
+          this.chordCountsInLabels.get(song.difficulty)[chord] = 1;
+        }
+      }, this);
+    }, this);
+  },
   valueForChordDifficulty: function (difficulty, chord) {
     const value = this.likelihoodFromChord(difficulty, chord);
     return value ? value + this.smoothing : 1;
@@ -61,21 +75,6 @@ function setLabelProbabilities() {
     });
 }
 
-function setChordCountsInLabels() {
-    songList.songs.forEach(function(song) {
-        if (classifier.chordCountsInLabels.get(song.difficulty) === undefined) {
-            classifier.chordCountsInLabels.set(song.difficulty, {});        
-        }
-        song.chords.forEach(function(chord) {
-            if (classifier.chordCountsInLabels.get(song.difficulty)[chord] > 0) {
-                classifier.chordCountsInLabels.get(song.difficulty)[chord] += 1;
-            } else {
-                classifier.chordCountsInLabels.get(song.difficulty)[chord] = 1;
-            }
-        });
-    });
-}
-
 function trainAll() {
     songList.songs.forEach(function(song) {
         train(song.chords, song.difficulty);
@@ -85,7 +84,7 @@ function trainAll() {
 
 function setLabelsAndProbabilities() {
     setLabelProbabilities();
-    setChordCountsInLabels();
+    classifier.setChordCountsInLabels();
 }
 
 const wish = require('wish');
